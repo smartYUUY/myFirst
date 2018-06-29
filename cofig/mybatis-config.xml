@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 引入外部属性文件 -->
+	<properties resource="jdbc.properties" />
+	<typeAliases>
+		<!-- <typeAlias type="com.atguigu.mybatis.bean.Customer" alias="Customer"/> -->
+		<!-- 设置包下的类的别名，默认别名就是类的简单名称（首字母可以小写） -->
+		<package name="com.atguigu.bean"/>
+	</typeAliases>
+	
+	<!-- 配置MyBatis运行环境 -->
+	<environments default="development">
+		<!-- 配置专门用于开发过程的运行环境 -->
+		<environment id="development">
+			<!-- 配置事务管理器 -->
+			<transactionManager type="JDBC" />
+			<!-- 配置数据源 -->
+			<dataSource type="POOLED">
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+				<property name="driver" value="${jdbc.driverClassName}" />
+				<property name="url" value="${jdbc.url}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 管理映射配置 -->
+	<mappers>
+		<mapper resource="com/atguigu/dao/CustomerDaoMapper.xml"/>
+		<!-- <package name="com.atguigu.dao"/> -->
+	</mappers>
+
+</configuration>

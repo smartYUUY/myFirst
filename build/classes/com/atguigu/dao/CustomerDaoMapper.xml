@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.dao.CustomerDao">	
+			
+	<!-- 为CustomerMapper接口的saveCustomer(Customer customer)方法声明对应的SQL语句，MyBatis会根据这个配置生成抽象方法的实现 -->
+	<!-- id属性的值即为对应方法名 -->
+	<insert id="save">
+		INSERT INTO tbl_cust (cust_name, cust_age) VALUES (#{custName}, #{custAge})
+	</insert>
+	
+	<!--实验1：删除cust_id为8的Customer  -->
+	<delete id="deleteCustomerById" parameterType="int">
+		delete from tbl_cust where cust_id=#{id};
+	</delete>
+	
+	<!-- 实验2：更新cust_id为10的Customer的姓名和年龄 -->
+	<update id="updateCustomerById" parameterType="com.atguigu.bean.Customer">
+		update tbl_cust set cust_name=#{custName},cust_age=#{custAge}  where cust_id=#{custId};
+	</update>
+	
+	<!-- 实验3：查询cust_id为12的Customer
+	<select id="selectCustomerById" resultType="com.atguigu.bean.Customer">
+		select cust_name as custName, cust_age as custAge from tbl_cust where cust_id=#{id};
+	</select> -->
+	
+	<!--实验4：查询List<Customer>，没有查询条件  -->
+	<select id="selectAll1" resultType="java.util.Map">
+		select * from tbl_cust;
+	</select>
+	
+	<!--实验5：查询List<Customer>，查询条件是 (以实体类对象形式封装查询条件) 
+	 cust_name包含'a'
+	 cust_age大于20 -->
+	<select id="selectAll2" parameterType="com.atguigu.bean.Customer"    resultType="com.atguigu.bean.Customer">
+		select cust_id as custId,cust_name as custName,cust_age as custAge 
+		from tbl_cust 
+		where cust_name like concat('%',#{custName},'%') and cust_age>#{custAge};
+	</select>
+	
+	<!-- 实验6：查询List<Customer>，查询条件是 (以Map类型的对象封装查询条件)
+	cust_name包含'a'
+	order_amount大于20 -->
+	<select id="selectAllByNameAndAmount" resultType="com.atguigu.bean.Customer">
+		select cust_id as custId,cust_name as custName,cust_age as custAge 
+		from tbl_cust
+		where cust_id in
+							(select cust_id from tbl_order 
+							where order_amount > #{order_amount}) 
+				and cust_name like concat('%',#{cust_name},'%');
+	</select>
+	
+	<!-- 实验7：查询List<Customer>，查询条件是 (传多个零散的参数)
+	cust_age在25~30之间 -->
+	<select id="selectAllAmongAge" resultType="com.atguigu.bean.Customer">
+		select cust_id as custId,cust_name as custName,cust_age as custAge
+		from tbl_cust
+		where cust_age between 25 and 30;
+	</select>
+	
+	<!-- 实验8：查询order_id为5的cust_name和order_name (将零散的查询结果封装到Map对象中返回) -->
+	<select id="getCustNameAndOrderNameByOrderId" resultType="java.util.Map">
+		select cust_name ,order_name 
+		from tbl_cust
+		inner join tbl_order
+		on tbl_cust.cust_id=tbl_order.cust_id
+		where order_id=#{id};
+	</select>   
+	
+	<!-- 实验9：查询order_amount大于20的cust_name和order_name
+	(查询结果的一条记录对应一个Map对象,多条记录的结果可以使用List封装Map对象) -->
+	<select id="getCustNameAndOrderNameByOrderAmount" resultType="java.util.Map">
+		select distinct cust_name , order_name 
+		from tbl_cust
+		inner join tbl_order
+		on tbl_cust.cust_id=tbl_order.cust_id
+		where order_amount>#{amount};
+	</select>
+	
+	<!-- 实验10：查询cust_id为12的Customer，但是使用resultMap映射 (使用resultMap方式解决字段名与属性名不一致问题) -->
+	<select id="getCustomer" resultMap="result">
+		select * from tbl_cust where cust_id=#{id};
+	</select>
+	<resultMap type="com.atguigu.bean.Customer" id="result">
+		<id property="custId" column="cust_id"/>
+		<result property="custName" column="cust_name"/>
+		<result property="custAge" column="cust_age"/>
+	</resultMap>
+	
+	<!-- 实验11：查询结果为单值，统计Customer数量 -->
+	<select id="selectCountCustomer" resultType="int">
+		select count(*) from tbl_cust;
+	</select>
+	
+	<!-- 实验12：执行DDL语句创建数据库表 -->
+	<update id="createTable">
+		create table ${tableName}(
+			id int primary key auto_increment,
+			name varchar(32) not null
+		);
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
